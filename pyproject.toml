@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "service-account-usage"
+version = "0.1.0"
+description = ""
+authors = ["kvanzuijlen <8818390+kvanzuijlen@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{include = "service_account_usage"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+google-api-python-client = "^2.88.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
