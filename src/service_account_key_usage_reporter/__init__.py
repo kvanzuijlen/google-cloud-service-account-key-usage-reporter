@@ -33,30 +33,30 @@ def get_service_account_key_usage(toplevel_parent: str):
                 except HttpError as exception:
                     if exception.reason.startswith("Policy Analyzer API has not been used in project"):
                         print(f"Policy Analyzer API has not been used in project {project_name}")
-                        writer.writerow({
+                        yield {
                             "project": project_name,
                             "fullResourceName": None,
                             "lastAuthenticatedTime": None,
                             "observation_start": None,
                             "observation_end": None,
                             "error": f"Policy Analyzer API has not been used in project {project_name}",
-                        })
+                        }
                         continue
                     raise exception
                 for activity in response.get("activities", []):
-                    yield project_name, activity
+                    yield {
+                        "project": project_name,
+                        "fullResourceName": activity["fullResourceName"],
+                        "lastAuthenticatedTime": activity.get("activity", {}).get("lastAuthenticatedTime"),
+                        "observation_start": activity.get("observationPeriod", {})["startTime"],
+                        "observation_end": activity.get("observationPeriod", {})["endTime"],
+                        "error": None,
+                    }
 
 
 if __name__ == "__main__":
     with Path("./service_account_key_usage_report.csv").open(mode="w") as file:
         writer = csv.DictWriter(f=file, fieldnames=["project", "fullResourceName", "lastAuthenticatedTime", "observation_start", "observation_end", "error"])
         writer.writeheader()
-        for project_name, activity in get_service_account_key_usage(toplevel_parent=os.getenv("TOPLEVEL_PARENT")):
-            writer.writerow({
-                "project": project_name,
-                "fullResourceName": activity["fullResourceName"],
-                "lastAuthenticatedTime": activity.get("activity", {}).get("lastAuthenticatedTime"),
-                "observation_start": activity.get("observationPeriod", {})["startTime"],
-                "observation_end": activity.get("observationPeriod", {})["endTime"],
-                "error": None,
-            })
+        for data in get_service_account_key_usage(toplevel_parent=os.getenv("TOPLEVEL_PARENT")):
+            writer.writerow(data)
