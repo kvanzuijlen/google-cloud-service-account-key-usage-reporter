@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "service-account-usage"
+name = "service-account-key-usage-reporter"
 version = "0.1.0"
 description = ""
 authors = ["kvanzuijlen <8818390+kvanzuijlen@users.noreply.github.com>"]
